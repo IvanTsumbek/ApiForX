@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Post\IndexController;
+use App\Http\Controllers\Post\StoreController;
+use App\Http\Controllers\Post\CreateController;
 
 Route::get('/', function () {return view('welcome');});
 
@@ -20,10 +23,10 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/redirect', [AuthController::class, 'redirect'])->name('redirect');
 Route::get('/callback', [AuthController::class, 'callback'])->name('callback');
+Route::get('/posts', [IndexController::class, 'index'])->name('index');
+Route::get('/post/create', [CreateController::class, 'create'])->name('create');
+Route::post('/post/store', [StoreController::class, 'store'])->name('store');
 
-// Route::get('spreaker/show', [SpreakerShowIndexController::class, 'index'])->middleware('auth')->name('spreaker.show.index');
-// Route::get('spreaker/create', [SpreakerShowCreateController::class, 'create'])->middleware('auth')->name('spreaker.show.create');
-// Route::post('spreaker/create', [SpreakerShowStoreController::class, 'store'])->middleware('auth')->name('spreaker.show.store');
 });
 
 

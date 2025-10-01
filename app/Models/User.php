@@ -45,4 +45,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function xTokens()
+    {
+        return $this->hasMany(XToken::class);
+    }
 }
