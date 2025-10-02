@@ -9,7 +9,6 @@ class XTokenValid
 {
     protected $clientId;
     protected $clientSecret;
-    protected $tokenModel;
 
     public function __construct()
     {
@@ -56,4 +55,10 @@ class XTokenValid
 
         return $token;
     }
+
+    public function getXUserId($user)
+{
+    $token = $user->xTokens()->latest()->first();
+    return $token->x_user_id ?? null;
+}
 }

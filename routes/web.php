@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Post\IndexController;
 use App\Http\Controllers\Post\StoreController;
 use App\Http\Controllers\Post\CreateController;
+use App\Http\Controllers\Post\DeleteController;
 
 Route::get('/', function () {return view('welcome');});
 
@@ -26,7 +27,7 @@ Route::get('/callback', [AuthController::class, 'callback'])->name('callback');
 Route::get('/posts', [IndexController::class, 'index'])->name('index');
 Route::get('/post/create', [CreateController::class, 'create'])->name('create');
 Route::post('/post/store', [StoreController::class, 'store'])->name('store');
-
+Route::delete('/delete/{id}', [DeleteController::class, 'delete'])->name('delete');
 });
 
 

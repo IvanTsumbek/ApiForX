@@ -55,19 +55,25 @@ class AuthController extends Controller
             'code_verifier' => $codeVerifier,
         ];
         $response = Http::asForm()
-                        ->withHeaders(['Authorization' => 'Basic ' . $basicAuth])
-                        ->post('https://api.x.com/2/oauth2/token', $query);
+            ->withHeaders(['Authorization' => 'Basic ' . $basicAuth])
+            ->post('https://api.x.com/2/oauth2/token', $query);
 
         $data = $response->json();
         $user = auth()->user();
+        $response2 = Http::withToken($data['access_token'])
+            ->get('https://api.x.com/2/users/me');
+        $userData = $response2->json();
+        $xUserId = $userData['data']['id'] ?? null;
         $token = $user->xTokens()->updateOrCreate(
-            [ 
-                'user_id' => $user->id,
+            ['user_id' => $user->id],
+            [
                 'access_token' => $data['access_token'],
                 'refresh_token' => $data['refresh_token'],
-                'expires_at' => now()->addSeconds($data['expires_in']),
+                'expires_at'   => now()->addSeconds($data['expires_in']),
+                'x_user_id'    => $xUserId,
             ]
         );
+
         return redirect()->route('index');
     }
 }
