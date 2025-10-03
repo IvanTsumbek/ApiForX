@@ -10,7 +10,7 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     {{ __("You're logged in!") }}
-                    <h1 style="font-size: 70px; color:blue;"><a href="{{ route('redirect') }}">Go X</a></h1>
+                    <h1 style="font-size: 70px; color:blue;"><a href="{{ route('index') }}">Go X</a></h1>
                 </div>
             </div>
         </div>

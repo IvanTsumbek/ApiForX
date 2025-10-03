@@ -2,8 +2,9 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Http;
 use App\Models\XToken;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 
 class XTokenValid
 {
@@ -21,44 +22,45 @@ class XTokenValid
         $token = $user->xTokens()->latest()->first();
 
         if (!$token) {
-            throw new \Exception('No X token found for user.');
+            return null;
         }
 
-        // проверяем, истёк ли токен
         if (!$token->expires_at || now()->greaterThan($token->expires_at)) {
-            // обновляем токен через refresh_token
             $token = $this->refreshToken($token);
         }
-
-        return $token->access_token;
+        return $token;
     }
 
     protected function refreshToken(XToken $token)
     {
-        $response = Http::asForm()->post('https://api.x.com/2/oauth2/token', [
-            'grant_type' => 'refresh_token',
-            'refresh_token' => $token->refresh_token,
-            'client_id' => $this->clientId,
-        ]);
+        $basicAuth = base64_encode("{$this->clientId}:{$this->clientSecret}");
+
+        $response = Http::asForm()
+            ->withHeaders([
+                'Authorization' => "Basic {$basicAuth}",
+            ])
+            ->post('https://api.twitter.com/2/oauth2/token', [
+                'grant_type'    => 'refresh_token',
+                'refresh_token' => $token->refresh_token,
+            ]);
 
         $data = $response->json();
 
-        if (isset($data['error'])) {
-            throw new \Exception('Failed to refresh X token: ' . $data['error_description'] ?? $data['error']);
+        if (!$response->ok() || isset($data['error'])) {
+            Log::error('Twitter refresh failed', [
+                'status' => $response->status(),
+                'body'   => $data,
+            ]);
+
+            throw new \Exception('Failed to refresh X token: ' . ($data['error_description'] ?? $data['error'] ?? 'Unknown error'));
         }
 
         $token->update([
-            'access_token' => $data['access_token'],
-            'refresh_token' => $data['refresh_token'],
-            'expires_at' => now()->addSeconds($data['expires_in']),
+            'access_token'  => $data['access_token'],
+            'refresh_token' => $data['refresh_token'] ?? $token->refresh_token, // если вернули новый
+            'expires_at'    => now()->addSeconds($data['expires_in']),
         ]);
 
         return $token;
     }
-
-    public function getXUserId($user)
-{
-    $token = $user->xTokens()->latest()->first();
-    return $token->x_user_id ?? null;
-}
 }

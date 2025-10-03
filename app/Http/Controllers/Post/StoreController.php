@@ -12,15 +12,17 @@ use App\Http\Resources\Post\StoreResource;
 
 class StoreController extends Controller
 {
+    public function __construct(readonly XTokenValid $service)
+    {}
+
     public function store(StoreRequest $request)
     {
-        try {
-            $xTokenService = new XTokenValid();
-            $accessToken = $xTokenService->getAccessToken(auth()->user());
+        $token = $this->service->getAccessToken(auth()->user());
 
+        try {
             $payload = (new StoreResource($request))->resolve();
 
-            $response = Http::withToken($accessToken)->post('https://api.x.com/2/tweets',  $payload);
+            $response = Http::withToken($token->access_token)->post('https://api.x.com/2/tweets',  $payload);
             if ($response->failed()) {
                 Log::channel('postCreate')->error('Ошибка от X API', [
                     'status' => $response->status(),
