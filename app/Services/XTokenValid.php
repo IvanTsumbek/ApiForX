@@ -17,7 +17,13 @@ class XTokenValid
         $this->clientSecret = config('services.x.client_secret');
     }
 
-    public function getAccessToken($user)
+    /**
+     * Undocumented function
+     *
+     * @param [type] $user
+     * @return object|null
+     */
+    public function getAccessToken($user): object|null
     {
         $token = $user->xTokens()->latest()->first();
 
@@ -28,6 +34,7 @@ class XTokenValid
         if (!$token->expires_at || now()->greaterThan($token->expires_at)) {
             $token = $this->refreshToken($token);
         }
+        
         return $token;
     }
 

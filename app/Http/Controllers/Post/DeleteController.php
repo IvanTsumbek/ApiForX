@@ -2,20 +2,14 @@
 
 namespace App\Http\Controllers\Post;
 
-use App\Services\XTokenValid;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
+use App\Http\Controllers\TweeterAbstractClass;
 
-class DeleteController extends Controller
+class DeleteController extends TweeterAbstractClass
 {
-    public function __construct(readonly XTokenValid $service) 
-    {}
-
     public function delete($id)
     {
-        $token = $this->service->getAccessToken(auth()->user());
-
-        $response = Http::withToken($token->access_token)
+        $response = Http::withToken($this->token->access_token)
             ->delete("https://api.x.com/2/tweets/{$id}");
 
         if ($response->successful()) {

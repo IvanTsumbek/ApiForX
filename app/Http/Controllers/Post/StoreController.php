@@ -2,27 +2,21 @@
 
 namespace App\Http\Controllers\Post;
 
-use Illuminate\Http\Request;
-use App\Services\XTokenValid;
 use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
 use App\Http\Requests\Post\StoreRequest;
 use App\Http\Resources\Post\StoreResource;
+use App\Http\Controllers\TweeterAbstractClass;
 
-class StoreController extends Controller
+class StoreController extends TweeterAbstractClass
 {
-    public function __construct(readonly XTokenValid $service)
-    {}
-
     public function store(StoreRequest $request)
     {
-        $token = $this->service->getAccessToken(auth()->user());
 
         try {
             $payload = (new StoreResource($request))->resolve();
 
-            $response = Http::withToken($token->access_token)->post('https://api.x.com/2/tweets',  $payload);
+            $response = Http::withToken($this->token->access_token)->post('https://api.x.com/2/tweets',  $payload);
             if ($response->failed()) {
                 Log::channel('postCreate')->error('Ошибка от X API', [
                     'status' => $response->status(),

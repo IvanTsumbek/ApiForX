@@ -2,25 +2,18 @@
 
 namespace App\Http\Controllers\Post;
 
-use Illuminate\Http\Request;
-use App\Services\XTokenValid;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\TweeterAbstractClass;
 use Illuminate\Support\Facades\Http;
 
-class ShowController extends Controller
+class ShowController extends TweeterAbstractClass
 {
-    public function __construct(readonly XTokenValid $service)
-    {}
-
     public function show($id)
     {
-        $token = $this->service->getAccessToken(auth()->user());
 
-        $response = Http::withToken($token->access_token)
+        $response = Http::withToken($this->token->access_token)
             ->get("https://api.x.com/2/tweets/{$id}");
 
-        $tweetResponse = $response->json();
-        $tweet = $tweetResponse['data'] ?? [];
+        $tweet = $response->json()['data'] ?? [];
             
         return view('post.show', compact('tweet'));
     }

@@ -67,14 +67,13 @@ class AuthController extends Controller
             abort(500, 'Twitter OAuth error: ' . ($data['error_description'] ?? 'Unknown error'));
         }
 
-        $response2 = Http::withToken($data['access_token'])
+        $getUserResponse = Http::withToken($data['access_token'])
             ->get('https://api.twitter.com/2/users/me');
 
-        $userData = $response2->json();
-        $xUserId = $userData['data']['id'] ?? null;
-
+        $xUserId = $getUserResponse->json['data']['id'] ?? null;
+    
         $user = auth()->user();
-        $user->xTokens()->updateOrCreate(
+        $user->xTokens()->create(
             ['user_id' => $user->id],
             [
                 'access_token'  => $data['access_token'],

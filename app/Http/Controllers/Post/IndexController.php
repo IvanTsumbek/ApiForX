@@ -2,25 +2,20 @@
 
 namespace App\Http\Controllers\Post;
 
-use App\Http\Controllers\Controller;
-use App\Services\XTokenValid;
+use App\Http\Controllers\TweeterAbstractClass;
 use Illuminate\Support\Facades\Http;
 
-class IndexController extends Controller
+class IndexController extends TweeterAbstractClass
 {
-    public function __construct(readonly XTokenValid $service)
-    {}
 
     public function index()
     {
-        $token = $this->service->getAccessToken(auth()->user());
-
-        if (!$token) {
+        if (!$this->token) {
             return redirect()->route('redirect')->with('error', 'Авторизуйтесь через X, чтобы получить доступ.');
         }
 
-        $response = Http::withToken( $token->access_token)
-            ->get("https://api.x.com/2/users/{$token->x_user_id}/tweets", [
+        $response = Http::withToken( $this->token->access_token)
+            ->get("https://api.x.com/2/users/{$this->token->x_user_id}/tweets", [
                 'max_results' => 10,
                 'tweet.fields' => 'id,text,created_at',
             ]);
