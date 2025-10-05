@@ -24,7 +24,7 @@ class UserDialogCreate extends Command
             return Command::FAILURE;
         }
 
-        $email = $this->ask('Ваше  email?');
+        $email = $this->ask('Ваш  email?');
         $validator = Validator::make(['email' => $email], [
             'email'    => ['required', 'email', Rule::unique('users', 'email')],
         ]);

@@ -31,7 +31,7 @@ class AuthController extends Controller
             'client_id'             => config('services.x.client_id'),
             'redirect_uri'          => config('services.x.redirect_uri'),
             'state'                 => $state,
-            'scope'                 => 'tweet.read tweet.write users.read offline.access',
+            'scope'                 => 'tweet.read tweet.write users.read media.write offline.access',
             'code_challenge'        => $codeChallenge,
             'code_challenge_method' => 'S256',
         ]);
@@ -74,8 +74,9 @@ class AuthController extends Controller
     
         $user = auth()->user();
         $user->xTokens()->create(
-            ['user_id' => $user->id],
+            // ['user_id' => $user->id],
             [
+                'user_id' => $user->id,
                 'access_token'  => $data['access_token'],
                 'refresh_token' => $data['refresh_token'] ?? null,
                 'expires_at'    => now()->addSeconds($data['expires_in']),
